@@ -1,0 +1,117 @@
+\documentclass[12pt]{amsart}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[margin=1in]{geometry}
+\usepackage{stackengine}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue
+}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{question}[theorem]{Question}
+\newtheorem{caution}[theorem]{Caution}
+
+\begin{document}
+
+\title{Homework}
+
+\maketitle
+
+For this week, please answer the following questions from the text. 
+I've copied the problem itself below and the question numbers for 
+your convenience. 
+
+\begin{enumerate}
+	\item (3.36) This exercise asks you to use the index calculus 
+		to solve a discrete logarithm problem. Let $p = 
+		19079$ and $g=17$. 
+	\begin{enumerate}
+		\item Verify that $g^i \mod p$ is $5$-smooth for each 
+			of the values $i = 3030, i = 6892,$ and $i = 
+			18312$.
+		\item Use your computations in part (a) and linear 
+			algebra to compute the discrete logarithms 
+			$\log_g(2), \log_g(3),$ and $\log_g(5)$. (Note 
+			that $19078 = 2 \cdot 9539$ and that $9539$ 
+			is prime.) 
+		\item Verify that $19 \cdot 17^{-12400} \mod p$ is 
+			$5$-smooth. 
+		\item Use the values from (b) and the computation in 
+			(c) to solve the discrete logarithm problem 
+		\begin{displaymath}
+			17^x = 19 \mod 19079
+		\end{displaymath}
+	\end{enumerate}
+	\item (3.37) Let $p$ be an odd prime and let $a$ be an integer 
+		with $p \nmid a$. 
+	\begin{enumerate}
+		\item Prove that $a^{(p-1)/2}$ is congruent to either $1$ 
+			or $-1$ modulo $p$. 
+		\item Prove that $a^{(p-1)/2}$ is congruent to $1$ modulo 
+			$p$ if and only if $a$ is a quadratic residue 
+			modulo $p$. (Hint: Let $g$ be a primitive root for 
+			$p$ and use the fact, proven during the course of 
+			proving Proposition 3.61, that $g^m$ is a quadratic 
+			residue if and only if $m$ is even.) 
+		\item Prove that $a^{(p-1)/2} = \left( \frac{a}{p} \right) 
+			\mod p$. 
+		\item Use (c) to prove Theorem 3.62(a), that is prove that 
+		\begin{displaymath}
+			\left( \frac{-1}{p} \right) = 
+				\begin{cases} 
+					1 & \text{ if } p = 1 \mod 4 \\
+					-1 & \text{ if } p = 3 \mod 4 
+				\end{cases}
+		\end{displaymath}
+	\end{enumerate} 
+	\item (3.39) Let $p$ be a prime satisfying $p = 3 \mod 4$. 
+	\begin{enumerate}
+		\item Let $a$ be a quadratic residue modulo $p$. Prove that 
+			the number 
+		\begin{displaymath}
+			b = a^{(p+1)/4} \mod p 
+		\end{displaymath}
+		has the property that $b^2 = a \mod p$. (Hint: Write $(p+1)/2$ 
+		as $1 + (p-1)/2$ and use Exercise 3.37.) This gives an easy way 
+		to take square roots modulo $p$ for primes that are congruent 
+		to $3$ modulo $4$.
+		\item Use (a) to compute the following square roots modulo $p$. 
+			Be sure to check your answers. 
+		\begin{enumerate}
+			\item Solve $b^2 = 116 \mod 587$ 
+			\item Solve $b^2 = 3217 \mod 8627$ 
+			\item Solve $b^2 = 9109 \mod 10663$ 
+		\end{enumerate}
+	\end{enumerate}
+	\item (3.40) Let $p$ be an odd prime, let $g \in \mathbb{F}_p^\times$ be 
+		a primitive root, and let $h \in \mathbb{F}_p^\times$. Write 
+		$p-1 = 2^s m$ with $m$ odd and $s \geq 1$, and write the binary 
+		expansion of $\log_g(h)$ as 
+	\begin{displaymath}
+		\log_g(h) = \epsilon_0 + 2 \epsilon_1 + 4 \epsilon_2 + 8 \epsilon_3 
+		+ \cdots \text{ with } \epsilon_i \in \lbrace 0,1 \rbrace. 
+	\end{displaymath}
+		Give an algorithm that generalizes Example 3.69 and allows you to 
+		rapidly compute $\epsilon_1, \epsilon_2,\ldots, \epsilon_{s-1}$, 
+		thereby proving that the first $s$ bits of the discrete logarithm 
+		are insecure. You may assume you have a fast algorithm to compute 
+		square roots in $\mathbb{F}_p^\times$, as provided by for example 
+		by Exercise 3.39(a). (Hint: Use Example 3.69 to compute the 0th 
+		bit, take the square root of either $h$ or $g^{-1}h$ and repeat.)
+		$p = 3 \mod 4$
+\end{enumerate}
+\end{document}
