@@ -9,7 +9,7 @@ back here before midnight on the due date. You may do this as many times as
 you want. Only your final submission counts.
 
 Remember this is math class so be sure to justify your answers. You will be 
-graded on correctness and 
+graded on correctness and proper justification.
 
 Note: when you submit, your filename must be `solutions.pdf` and it must be a pdf. 
 
