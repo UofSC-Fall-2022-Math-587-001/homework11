@@ -1,9 +1,11 @@
 package library
 
-import "math"
+import (
+	"math"
+)
 
-// A modification of the built-in modulus % which 
-// always returns a positive remainder 
+// A modification of the built-in modulus % which
+// always returns a positive remainder
 func ModN(N uint, i int) int {
 	m := i % int(N) 
 	if m < 0 {
@@ -194,18 +196,27 @@ func IsBSmooth(n int,l []int) bool {
 	return false
 }
 
+// EulerCrit tests if a is a quadratic residue modulo a by computing 
+// a^{(p-1)/2} mod p 
 func EulerCrit(p, a int) bool {
+	//fmt.Printf("Checking if %d is a quadratic residue mod %d\n",a,p) 
 	m := FastPower(uint(p),a,uint((p-1)/2))
+	//fmt.Printf("Euler's Criteria returns a^{(p-1)/2} = %d\n",m)
 	if m == 1 {
+		//fmt.Printf("m=1 so we are a quadratic residue\n") 
 		return true 
 	}
+	//fmt.Printf("m=-1 so we are not a quadratic residue\n") 
 	return false 
 }
 
 /// GetQuadNonRes(p) returns a quadratic non-residue 
 func GetQuadNonRes(p int) int {
+	//fmt.Printf("We iterate to find a non-quadratic residue mod %d\n",p)
 	for i := 2; i < p; i++ {
+		//fmt.Printf("Testing %d\n",i)
 		if !EulerCrit(p,i) {
+			//fmt.Printf("Euler's criteria returned %t for %d\n",EulerCrit(p,i),i)
 			return i
 		}
 	}
@@ -220,39 +231,56 @@ func TonelliShanks(p, a int) (bool,[]int) {
 	// If p = 3 mod 4, then check that a^{(p+1)/4} is a square root of 
 	// a. If not, return false and the empty slice. Otherwise 
 	// return true, [r,(-r) mod p] 
+	//fmt.Printf("Using Tonelli-Shanks to find solutions to x^2 = %d mod %d\n",a,p) 
+	a = ModN(uint(p),a)
 	if p == 2{ 
+		//fmt.Printf("p=2 so %d is its own (and only) square root\n",a) 
 		return true, []int{a}
 	} else if !EulerCrit(p,a) {
+		//fmt.Printf("Euler's Criteria return %t so we have no roots\n",EulerCrit(p,a))
 		return false, []int{}
 	} else if p % 4 == 3 {
+		//fmt.Printf("We have %d = 3 mod 4\n",p)
 		m := (p+1) / 4
 		r := FastPower(uint(p),a,uint(m))
+		//fmt.Printf("We check that if %d=%d^{(p+1)/4} is a square root of %d\n",r,a,a) 
 		if FastPower(uint(p),r,2) == a {
-			return true, []int{r,p-r}
+			//fmt.Printf("Indeed %d^2 = %d = %d so we return %d and %d as roots\n",
+			// r,FastPower(uint(p),r,2),a,r,ModN(uint(p),p-r))
+			return true, []int{r,ModN(uint(p),p-r)}
 		}
+		//fmt.Printf("%d^2 = %d is not = %d so there are no roots\n",r,FastPower(uint(p),r,2),a) 
 		return false, []int{}
 	}
 	// Find a quadratic non-residue modulo p 
+	//fmt.Printf("We have %d = 1 mod 4\n",p)
 	z := GetQuadNonRes(p)
+	//fmt.Printf("We find a quadratic non-residue %d\n",z) 
 	// Factor p-1 into 2^s*q for q odd 
+	//fmt.Printf("We factor %d-1 = 2^s q for q odd\n",p)
 	s := 0 
 	q := p-1 
 	for q % 2 == 0 {
 		q = q / 2 
 		s += 1
 	}
+	//fmt.Printf("We get s = %d and q = %d\n",s,q) 
 	// Initialize d = (q+1)/2, x = a^q mod p, c = z^q mod p and 
 	// r = a^d mod p 
 	d := (q + 1)/2 
 	x := FastPower(uint(p),a,uint(q))
 	c := FastPower(uint(p),z,uint(q))
 	r := FastPower(uint(p),a,uint(d))
+	//fmt.Printf("We initialize d = (%d+1)/2 = %d, x = %d^%d = %d, c = %d^%d = %d, and r = %d^%d = %d\n",
+	// q,d,a,q,x,z,q,c,a,d,r)
 	// Loop while x != 1
 	//  - if x = 0, then return true, [0]
 	//  - else compute the minimal i such that x^{2^i} = 1 
 	//    let b = c^{2*s - i -1} mod p, s = i, c = b^2 mod p, 
 	//    x = x*c mod p, and r = r*b mod p 
 	for x != 1 {
+		//fmt.Printf("Still trying to solve x^2 = %d mod %d\n",a,p)
+		//fmt.Printf("%d is not 1 so we loop\n",x)
 		if x == 0 {
 			return true, []int{0}
 		}
@@ -262,12 +290,18 @@ func TonelliShanks(p, a int) (bool,[]int) {
 			y = FastPower(uint(p),y,2)
 			i += 1
 		}
-		b := FastPower(uint(p),c,uint(2*s-i-1))
+		//fmt.Printf("We find that %d is the minimal i such that %d^{2^i} = 1\n",i,x)
+		exp := FastPower(uint(p-1),2,uint(s-i-1))
+		b := FastPower(uint(p),c,uint(exp))
+		//fmt.Printf("We compute %d = %d^{2*%d-%d-1}\n",b,c,s,i)
 		s = i 
 		c = FastPower(uint(p),b,2)
 		x = ModN(uint(p),x*c) 
-		r = ModN(uint(p),r*b) 
+		r = ModN(uint(p),r*b)
+		//fmt.Printf("We update s = %d, d = (%d+1)/2 = %d, x = %d^%d = %d, c = %d^%d = %d, and r = %d^%d = %d\n",
+		// s,q,d,a,q,x,z,q,c,a,d,r)
 	}
+	//fmt.Printf("We have x = %d = 1 so we stop and return %d,%d\n",x,r,ModN(uint(p),p-r))
 	return true, []int{r,p-r}
 }
 
@@ -290,149 +324,4 @@ func GenTonelliShanks(p, e, a int) (bool,[]int) {
 		return true, roots 
 	}
 	return false, []int{}
-}
-
-// Computes n^e as an integer
-func IntPow(n, e int) int {
-	prod := 1 
-	for i := 0; i < e; i++ {
-		prod *= n 
-	}
-	return prod
-}
-
-// Given a slice of integers ints and another slice of ints exps, Prod 
-// returns the product of all the primes raised to the corresponding 
-// exponents. 
-func Prod(ints []int, exps []int) int {
-	prod := 1 
-	for key, num := range(ints) {
-		prod *= IntPow(num, exps[key])
-	}
-	return prod
-}
-
-// Reduce the entries of a matrix modulo N 
-func MatModN(N int, matrix [][]int) {
-	for _ , vect := range(matrix) {
-		for _ , entry := range(vect) {
-			entry = ModN(uint(N),entry)
-		}
-	}	
-}
-
-func Dimensions(matrix [][]int) (int,int) { 
-	rows := len(matrix) 
-	cols := 0 
-	for _, vect := range(matrix) {
-		cols = len(vect) 
-		break
-	}
-	return rows, cols 
-}
-
-// Scalar multiplication of vectors  
-func ScalarMul(c int, matrix []int) {
-	for _ , component := range(matrix) {
-		component = c*component 
-	}	
-}
-
-// Adding vectors 
-func AddVectsModN(N int, v, w []int) []int {
-	sum := []int{}
-	for key, val := range(v) {
-		term := ModN(uint(N),val + w[key])
-		sum = append(sum,term)
-	}
-	return sum 
-}
-
-// Get the index of the first row whose index is > frozenrows 
-// and with a nonzero entry in column i. If there is none, 
-// then return -1
-func GetPivot(matrix [][]int, i, frozenrows int) int {
-	for key, row := range(matrix) {
-		if key <= frozenrows {
-			continue 
-		}
-		for ind, entry := range(row) {
-			if ind == i && entry != 0 {
-				return key 
-			}
-		} 
-	}
-	return -1 
-}
-
-// Reduces a matrix over F_2 into row echelon form 
-func REForm (matrix [][]int) {
-	MatModN(2,matrix) 
-	rows, cols := Dimensions(matrix)
-	frozenrows := 0 
-	for i := 0; i < cols; i++ {
-		pivot := GetPivot(matrix,i,frozenrows) 
-		switch pivot {
-		case -1: 
-			continue  
-		case frozenrows + 1: 
-			pivotrow := matrix[pivot] 
-			for j := pivot + 1; j < rows; j++ {
-				if matrix[j][i] != 0 {
-					matrix[j] = AddVectsModN(2,matrix[j],pivotrow)
-				}
-			}
-		default: 
-			pivotrow := matrix[pivot] 
-			matrix[pivot] = matrix[frozenrows+1] 
-			matrix[frozenrows+1] = pivotrow
-			for j := pivot + 1; j < rows; j++ {
-				if matrix[j][i] != 0 {
-					matrix[j] = AddVectsModN(2,matrix[j],pivotrow)
-				}
-			}
-		}
-		frozenrows += 1
-	}
-}
-
-// Computes the kernel of matrix over F_2. 
-func Kernel (matrix [][]int) [][]int {
-	REForm(matrix)
-	rows , cols := Dimensions(matrix)
-	boundvars, freevars := []int{}, []int{} 
-	for i := 0; i < cols; i++ {
-		for _, row := range(matrix) {
-			for j:=0; j < rows; j++ {
-				if row[i] != 0 {
-					freevars = append(freevars, i)
-					break 
-				}
-			}
-		}
-	} 
-	for i := cols-1 ; i >= 0; i-- {
-		for _, val := range(boundvars) {
-			if i == val {
-				continue 
-			}
-		}
-	}
-	for _, var := range(boundvars) {
-	
-	}
-	return [][]int{}
-}
-
-// Multiplies the matrix with the vector to produce a new slice
-func MatrixMul (matrix [][]int, vector []int) []int {
-	output := []int{}
-	for _ , vect := range(matrix) {
-		component := 0 
-		for ind, val := range(vector) {
-			component += vect[ind]*val 
-		}
-		output = append(output, component)
-	}
-	return output
 }
